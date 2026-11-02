@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <meta name="theme-color" content="#1e3554" />
+    <meta name="description" content="Site Sketch — Buildsmart Group drafting for iPad. Plans in millimetres, offline." />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Site Sketch" />
+    <title>Site Sketch</title>
+    <link rel="icon" href="%BASE_URL%favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <section id="screen-list" class="screen">
+        <header class="list-header">
+          <div class="brand">
+            <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+              <rect x="2" y="2" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" />
+              <path d="M2 20h12v10" fill="none" stroke="currentColor" stroke-width="2" />
+              <path d="M8 14h16" stroke="#3e7a45" stroke-width="2" />
+            </svg>
+            <div>
+              <div class="brand-name">Buildsmart</div>
+              <div class="brand-product">Site Sketch</div>
+            </div>
+          </div>
+          <p class="lede">Plans in millimetres. Pencil draws, a finger pans and pinches. Works offline after the first open.</p>
+        </header>
+        <div class="list-body">
+          <button id="new-sketch" type="button">New sketch</button>
+          <p id="storage-error" class="storage-error" hidden></p>
+          <ul id="project-list"></ul>
+          <p id="empty-state" class="empty-state" hidden>No sketches yet.</p>
+        </div>
+      </section>
+
+      <section id="screen-editor" class="screen" hidden>
+        <header id="topbar">
+          <button id="back" type="button">Sketches</button>
+          <div class="brand brand-compact">
+            <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+              <rect x="2" y="2" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" />
+              <path d="M2 20h12v10" fill="none" stroke="currentColor" stroke-width="2" />
+              <path d="M8 14h16" stroke="#3e7a45" stroke-width="2" />
+            </svg>
+            <div class="brand-name">Buildsmart</div>
+          </div>
+          <h1 id="project-name">Sketch</h1>
+          <div class="top-actions">
+            <button id="undo" type="button" aria-label="Undo">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7H5v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M5.5 12a6.5 6.5 0 1 0 2.2-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+            </button>
+            <button id="redo" type="button" aria-label="Redo">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 7h4v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M18.5 12a6.5 6.5 0 1 1-2.2-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+            </button>
+          </div>
+        </header>
+
+        <div id="workspace">
+          <nav id="toolbar" aria-label="Drawing tools">
+            <button class="tool" type="button" data-tool="select" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3l5 14 2-5 5-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /></svg>
+              <span>Select</span>
+            </button>
+            <button class="tool" type="button" data-tool="room" aria-pressed="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" fill="none" stroke="currentColor" stroke-width="1.8" /></svg>
+              <span>Room</span>
+            </button>
+            <button class="tool" type="button" data-tool="wall" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18L18 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" /></svg>
+              <span>Wall</span>
+            </button>
+            <div class="sep"></div>
+            <div class="thick-group" role="radiogroup" aria-label="Wall thickness in millimetres">
+              <button class="thick" type="button" data-thickness="90" role="radio" aria-checked="true">90</button>
+              <button class="thick" type="button" data-thickness="110" role="radio" aria-checked="false">110</button>
+              <button class="thick" type="button" data-thickness="150" role="radio" aria-checked="false">150</button>
+            </div>
+            <div class="sep"></div>
+            <button id="fit" class="aux" type="button">Fit</button>
+            <button id="zoom-in" class="aux" type="button" aria-label="Zoom in">+</button>
+            <button id="zoom-out" class="aux" type="button" aria-label="Zoom out">−</button>
+            <div class="grow"></div>
+            <button id="delete" type="button">Delete</button>
+          </nav>
+          <div id="stage" tabindex="-1">
+            <canvas id="plan"></canvas>
+            <div id="overlay"></div>
+            <div id="live-readout" hidden></div>
+          </div>
+        </div>
+
+        <footer id="statusbar">
+          <span id="snap-readout">Snap 10 mm</span>
+          <span id="hud"></span>
+          <span id="scale-readout"><i id="scale-bar"></i><span id="scale-label">100 mm</span></span>
+          <span class="hint">Pencil draws · finger pans</span>
+          <span id="save-state">Saved</span>
+          <span class="units">Units mm</span>
+        </footer>
+        <p id="plan-summary" class="sr-only" aria-live="polite"></p>
+
+        <div id="dim-layer" hidden>
+          <button id="dim-backdrop" type="button" aria-label="Cancel dimension edit"></button>
+          <form id="dim-editor">
+            <label class="dim-label" for="dim-input" id="dim-title">Length</label>
+            <div class="dim-field">
+              <input id="dim-input" inputmode="decimal" autocomplete="off" enterkeyhint="done" />
+              <span class="dim-unit">mm</span>
+            </div>
+            <p id="dim-error" class="dim-error"></p>
+            <div class="dim-actions">
+              <button id="dim-cancel" type="button">Cancel</button>
+              <button id="dim-ok" type="submit">Set</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
