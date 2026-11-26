@@ -165,20 +165,24 @@ function drawBath(
 }
 
 function drawGrab(ctx: CanvasRenderingContext2D, fixture: Fixture, view: View): void {
-  const w = fixture.width / 2;
-  const bar = 16;
-  const y = Math.max(fixture.depth * 0.55, 36);
-  strokeLocal(ctx, fixture, view, roundedRect(-w, y - bar, w, y + bar, bar), true);
-  strokeLocal(ctx, fixture, view, [
-    { x: -w + 28, y: 8 },
-    { x: -w + 28, y: y - bar },
-  ], false);
-  strokeLocal(ctx, fixture, view, [
-    { x: w - 28, y: 8 },
-    { x: w - 28, y: y - bar },
-  ], false);
-  strokeLocal(ctx, fixture, view, rect(-w + 8, 0, -w + 64, 12), true);
-  strokeLocal(ctx, fixture, view, rect(w - 64, 0, w - 8, 12), true);
+  // Straight-rail block, true section: 14 mm wall flanges, 50 mm standoff, 32 mm tube.
+  // Length follows fixture.width so a shorter toilet-side rail stays a grab rail while it is dragged.
+  const half = fixture.width / 2;
+  const scale = fixture.depth / 82;
+  const y = (value: number) => value * scale;
+  strokeLocal(ctx, fixture, view, roundedRect(-half, y(50), half, y(82), y(16)), true);
+  for (const end of [-1, 1]) {
+    for (const inset of [28, 52]) {
+      const x = end * (half - inset);
+      strokeLocal(ctx, fixture, view, [
+        { x, y: y(14) },
+        { x, y: y(50) },
+      ], false);
+    }
+    const outer = end * (half - 8);
+    const inner = end * (half - 72);
+    strokeLocal(ctx, fixture, view, rect(Math.min(outer, inner), 0, Math.max(outer, inner), y(14)), true);
+  }
 }
 
 function drawGrabL(ctx: CanvasRenderingContext2D, fixture: Fixture, view: View): void {
@@ -210,8 +214,14 @@ function drawCurtain(ctx: CanvasRenderingContext2D, fixture: Fixture, view: View
 
 function drawNiche(ctx: CanvasRenderingContext2D, fixture: Fixture, view: View): void {
   const w = fixture.width / 2;
-  strokeLocal(ctx, fixture, view, rect(-w, 0, w, -fixture.depth), true);
-  strokeLocal(ctx, fixture, view, rect(-w + 12, -8, w - 12, -fixture.depth + 8), true);
+  const d = fixture.depth;
+  ctx.save();
+  traceLocal(ctx, fixture, view, rect(-w, 0, w, d), true);
+  ctx.fillStyle = "#f3f0e8";
+  ctx.fill();
+  ctx.restore();
+  strokeLocal(ctx, fixture, view, rect(-w, 0, w, d), true);
+  strokeLocal(ctx, fixture, view, rect(-w + 12, 8, w - 12, Math.max(12, d - 8)), true);
 }
 
 function drawMirror(ctx: CanvasRenderingContext2D, fixture: Fixture, view: View): void {

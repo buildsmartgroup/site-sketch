@@ -43,7 +43,8 @@ export const CATALOG: Record<FixtureKind, FixtureSpec> = {
   vanity: { label: "Vanity", width: 900, depth: 460, affl: 850, height: 0, diameter: 0, anchor: "back", recess: false, overhead: false, electrical: false, heightLabel: null },
   shower: { label: "Shower", width: 1200, depth: 1200, affl: 0, height: 0, diameter: 0, anchor: "center", recess: false, overhead: false, electrical: false, heightLabel: null },
   bath: { label: "Bath", width: 1675, depth: 760, affl: 0, height: 0, diameter: 0, anchor: "center", recess: false, overhead: false, electrical: false, heightLabel: null },
-  grab: { label: "Grab rail", width: 900, depth: 80, affl: 800, height: 0, diameter: 0, anchor: "back", recess: false, overhead: false, electrical: false, heightLabel: null },
+  // 600 mm is the toilet-side rail: shorter than a towel bar. The 32 mm tube, 50 mm standoff and end flanges are the straight-rail block's section (overall projection 82 mm).
+  grab: { label: "Grab rail", width: 600, depth: 82, affl: 800, height: 0, diameter: 0, anchor: "back", recess: false, overhead: false, electrical: false, heightLabel: null },
   "grab-l": { label: "L grab", width: 800, depth: 800, affl: 800, height: 700, diameter: 0, anchor: "corner", recess: false, overhead: false, electrical: false, heightLabel: "Vertical leg" },
   curtain: { label: "Curtain", width: 1200, depth: 40, affl: 2400, height: 0, diameter: 0, anchor: "back", recess: false, overhead: true, electrical: false, heightLabel: null },
   niche: { label: "Niche", width: 600, depth: 90, affl: 1000, height: 400, diameter: 0, anchor: "back", recess: true, overhead: false, electrical: false, heightLabel: "Opening height" },
@@ -93,7 +94,8 @@ export function localToWorld(fixture: Fixture, local: Point): Point {
 
 export function fixturePolygon(fixture: Fixture): Point[] {
   const spec = CATALOG[fixture.kind];
-  const depth = spec.recess ? -fixture.depth : fixture.depth;
+  // Local +Y is into the room, except a recess, whose rotation already points +Y into the wall.
+  const depth = fixture.depth;
   if (spec.anchor === "center") {
     const w = fixture.width / 2;
     const d = fixture.depth / 2;
@@ -140,11 +142,12 @@ export function attachToWall(wall: Wall, fixture: Fixture, along: number, side: 
   const spec = CATALOG[fixture.kind];
   if (!frame || spec.anchor === "center") return { ...fixture, wallId: null, along: null };
   const rotation = rotationFor(frame.nx * side, frame.ny * side, spec.recess);
-  const clamped = clampAlong(frame.length, along, fixture.width, spec.anchor, rotation, frame.ux, frame.uy);
+  const fitted = spec.recess ? { ...fixture, depth: Math.min(fixture.depth, wall.thickness) } : fixture;
+  const clamped = clampAlong(frame.length, along, fitted.width, spec.anchor, rotation, frame.ux, frame.uy);
   const center = pointAlong(wall, frame, clamped);
   const face = wall.thickness / 2;
   return {
-    ...fixture,
+    ...fitted,
     x: center.x + frame.nx * side * face,
     y: center.y + frame.ny * side * face,
     rotation,
