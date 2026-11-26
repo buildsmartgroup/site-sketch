@@ -1,6 +1,7 @@
 import { formatMm, worldToScreen } from "./geometry";
+import { isVisible } from "./phase";
 import { roomMetrics, roomOfWall, wallLength } from "./plan";
-import type { DimTarget, Plan, Point, View, Wall } from "./types";
+import type { DimTarget, Plan, Point, Sheet, View, Wall } from "./types";
 
 export type DimLabel = {
   key: string;
@@ -74,10 +75,11 @@ function measurement(plan: Plan, wall: Wall): Segment | null {
   };
 }
 
-export function layoutDimensions(plan: Plan, view: View): { labels: DimLabel[]; graphics: DimGraphic[] } {
+export function layoutDimensions(plan: Plan, view: View, sheet?: Sheet): { labels: DimLabel[]; graphics: DimGraphic[] } {
   const labels: DimLabel[] = [];
   const graphics: DimGraphic[] = [];
   for (const wall of plan.walls) {
+    if (sheet && !isVisible(wall, sheet)) continue;
     const segment = measurement(plan, wall);
     if (!segment || !(view.pxPerMm > 0)) continue;
     const laid = laySegment(segment, view);

@@ -33,7 +33,7 @@
               <div class="brand-product">Site Sketch</div>
             </div>
           </div>
-          <p class="lede">Plans in millimetres. Pencil draws, a finger pans and pinches. Works offline after the first open.</p>
+          <p class="lede">Existing and proposed plans in millimetres. Pencil draws, a finger pans and pinches. Works offline after the first open.</p>
         </header>
         <div class="list-body">
           <button id="new-sketch" type="button">New sketch</button>
@@ -55,7 +55,14 @@
             <div class="brand-name">Buildsmart</div>
           </div>
           <h1 id="project-name">Sketch</h1>
+          <div class="phase-toggle" role="group" aria-label="Drawing sheet">
+            <button id="phase-existing" type="button" data-sheet="existing" aria-pressed="true">Existing</button>
+            <button id="phase-proposed" type="button" data-sheet="proposed" aria-pressed="false">Proposed</button>
+          </div>
           <div class="top-actions">
+            <button id="job" type="button">Job</button>
+            <button id="export-pdf" type="button">PDF</button>
+            <button id="export-json" type="button">JSON</button>
             <button id="undo" type="button" aria-label="Undo">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7H5v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M5.5 12a6.5 6.5 0 1 0 2.2-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
             </button>
@@ -79,6 +86,34 @@
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18L18 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" /></svg>
               <span>Wall</span>
             </button>
+            <button class="tool" type="button" data-tool="door" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V5h8v14" fill="none" stroke="currentColor" stroke-width="1.8" /><path d="M13 19A8 8 0 0 0 13 5" fill="none" stroke="currentColor" stroke-width="1.4" /></svg>
+              <span>Door</span>
+            </button>
+            <button class="tool" type="button" data-tool="cavity" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h10v8H4z" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="M14 12h6" stroke="currentColor" stroke-width="1.6" /><path d="M17 9l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+              <span>Slider</span>
+            </button>
+            <button class="tool" type="button" data-tool="window" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="12" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="M4 12h16M12 6v12" stroke="currentColor" stroke-width="1.2" /></svg>
+              <span>Window</span>
+            </button>
+            <button class="tool" type="button" data-tool="fixture" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="M9 10h6M12 8v4" stroke="currentColor" stroke-width="1.4" /></svg>
+              <span>Fixture</span>
+            </button>
+            <button class="tool" type="button" data-tool="dim" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17h14M5 14v6M19 14v6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" /></svg>
+              <span>Dim</span>
+            </button>
+            <button class="tool" type="button" data-tool="callout" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="M10 10l8 8" stroke="currentColor" stroke-width="1.6" /></svg>
+              <span>Callout</span>
+            </button>
+            <button class="tool" type="button" data-tool="text" aria-pressed="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12M12 6v12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" /></svg>
+              <span>Text</span>
+            </button>
             <div class="sep"></div>
             <div class="thick-group" role="radiogroup" aria-label="Wall thickness in millimetres">
               <button class="thick" type="button" data-thickness="90" role="radio" aria-checked="true">90</button>
@@ -98,12 +133,14 @@
             <div id="live-readout" hidden></div>
           </div>
         </div>
+        <div id="inspector" hidden></div>
+        <div id="palette" hidden></div>
 
         <footer id="statusbar">
           <span id="snap-readout">Snap 10 mm</span>
           <span id="hud"></span>
           <span id="scale-readout"><i id="scale-bar"></i><span id="scale-label">100 mm</span></span>
-          <span class="hint">Pencil draws · finger pans</span>
+          <span id="phase-hint" class="hint">Existing · pencil draws</span>
           <span id="save-state">Saved</span>
           <span class="units">Units mm</span>
         </footer>
@@ -121,6 +158,19 @@
             <div class="dim-actions">
               <button id="dim-cancel" type="button">Cancel</button>
               <button id="dim-ok" type="submit">Set</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="form-layer" hidden>
+          <button id="form-backdrop" type="button" aria-label="Cancel"></button>
+          <form id="form-panel">
+            <h2 id="form-title">Edit</h2>
+            <div id="form-fields"></div>
+            <p id="form-error" class="dim-error"></p>
+            <div class="dim-actions">
+              <button id="form-cancel" type="button">Cancel</button>
+              <button id="form-ok" type="submit">Save</button>
             </div>
           </form>
         </div>
