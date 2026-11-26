@@ -119,7 +119,7 @@ Default size and the AFFL field:
 | `vanity` | 900 × 460 | Rim | 0 |
 | `shower` | 1200 × 1200 | 0 (floor waste) | 0 |
 | `bath` | 1675 × 760 | 0 | 0 |
-| `grab` | 900 × 80 | Rail centreline | 0 |
+| `grab` | 600 × 82 | Rail centreline. 32 mm tube, 50 mm off the wall, end flanges | 0 |
 | `grab-l` | 800 × 800 | Horizontal rail | Vertical leg length |
 | `curtain` | 1200 × 40 | Track | 0 |
 | `niche` | 600 × 90 | Sill | Opening height |
