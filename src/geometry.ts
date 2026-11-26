@@ -245,6 +245,51 @@ export function snappedDelta(anchor: Point, rawDelta: Point, grid: number): Poin
   return { x: snapped.x - anchor.x, y: snapped.y - anchor.y };
 }
 
+export function pointInPolygon(point: Point, polygon: Point[]): boolean {
+  if (polygon.length < 3) return false;
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; i += 1) {
+    const a = polygon[i];
+    const b = polygon[j];
+    const crosses = a.y > point.y !== b.y > point.y;
+    if (crosses) {
+      const x = ((b.x - a.x) * (point.y - a.y)) / (b.y - a.y) + a.x;
+      if (point.x < x) inside = !inside;
+    }
+    j = i;
+  }
+  return inside;
+}
+
+export type WallFrame = {
+  length: number;
+  ux: number;
+  uy: number;
+  /** Unit normal, left of a → b. */
+  nx: number;
+  ny: number;
+};
+
+export function wallFrame(wall: { a: Point; b: Point }): WallFrame | null {
+  const dx = wall.b.x - wall.a.x;
+  const dy = wall.b.y - wall.a.y;
+  const length = Math.hypot(dx, dy);
+  if (length < 1e-6) return null;
+  return { length, ux: dx / length, uy: dy / length, nx: -dy / length, ny: dx / length };
+}
+
+/** Distance along the centreline from wall.a, clamped to the segment. */
+export function projectOnWall(wall: { a: Point; b: Point }, point: Point): number {
+  const frame = wallFrame(wall);
+  if (!frame) return 0;
+  const t = (point.x - wall.a.x) * frame.ux + (point.y - wall.a.y) * frame.uy;
+  return Math.max(0, Math.min(frame.length, t));
+}
+
+export function pointAlong(wall: { a: Point; b: Point }, frame: WallFrame, distanceMm: number): Point {
+  return { x: wall.a.x + frame.ux * distanceMm, y: wall.a.y + frame.uy * distanceMm };
+}
+
 /** A round scale-bar length whose on-screen size sits near 120 px. */
 export function niceScaleMm(pxPerMm: number): number {
   const candidates = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000];

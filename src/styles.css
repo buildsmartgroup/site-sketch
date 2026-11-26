@@ -150,13 +150,31 @@ button { touch-action: manipulation; cursor: pointer; }
 
 #screen-editor { position: relative; }
 #topbar {
-  height: 56px;
+  min-height: 56px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 12px;
+  gap: 8px;
+  padding: 4px 8px;
   background: var(--bar);
   border-bottom: 2px solid var(--green);
+  flex-wrap: wrap;
+}
+.phase-toggle { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: white; }
+.phase-toggle button {
+  min-height: 44px;
+  min-width: 104px;
+  border: 0;
+  background: white;
+  color: var(--navy);
+  font-weight: 750;
+}
+.phase-toggle button[aria-pressed="true"] { background: #1a1a1a; color: white; }
+#phase-proposed[aria-pressed="true"] { background: #3e8ede; color: white; }
+#job, #export-pdf, #export-json {
+  border: 1px solid var(--line);
+  background: white;
+  color: var(--navy);
+  font-weight: 750;
 }
 #back, .top-actions button, .aux, .tool, .thick, #delete {
   min-height: 48px;
@@ -174,8 +192,9 @@ button { touch-action: manipulation; cursor: pointer; }
   text-overflow: ellipsis;
   min-width: 0;
 }
-.top-actions { margin-left: auto; display: flex; gap: 4px; }
-.top-actions button { width: 48px; padding: 0; }
+.top-actions { margin-left: auto; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.top-actions button { min-width: 44px; min-height: 44px; padding: 0 10px; }
+#undo, #redo { width: 48px; padding: 0; }
 .top-actions svg { width: 22px; height: 22px; display: block; margin: 0 auto; }
 button:disabled { opacity: 0.35; }
 
@@ -201,7 +220,7 @@ button:disabled { opacity: 0.35; }
   font-weight: 650;
   color: var(--navy);
 }
-.tool { min-height: 64px; }
+.tool { min-height: 56px; }
 .tool svg { width: 22px; height: 22px; }
 .tool[aria-pressed="true"] { background: var(--navy); color: white; }
 .thick { min-height: 44px; font-size: 15px; font-variant-numeric: tabular-nums; }
@@ -234,8 +253,8 @@ button:disabled { opacity: 0.35; }
   height: 100%;
   touch-action: none;
 }
-#overlay { position: absolute; inset: 0; pointer-events: none; }
-.dim-btn, .dim-live {
+#overlay { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.dim-btn, .dim-live, .dim-label {
   position: absolute;
   min-width: 48px;
   min-height: 44px;
@@ -246,9 +265,10 @@ button:disabled { opacity: 0.35; }
   font-size: 15px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  transform: translate(-50%, -50%) rotate(var(--rot));
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
   pointer-events: auto;
 }
+.dim-label { background: rgba(243, 240, 232, 0.94); }
 .dim-live { pointer-events: none; }
 .dim-btn span, .dim-live span {
   background: rgba(243, 240, 232, 0.94);
@@ -328,8 +348,99 @@ button:disabled { opacity: 0.35; }
 .dim-error { min-height: 1.2em; margin: 8px 0; color: var(--danger); font-size: 14px; }
 .dim-actions { display: flex; gap: 8px; }
 .dim-actions button { flex: 1; min-height: 52px; border-radius: 10px; font-size: 18px; font-weight: 700; }
-#dim-cancel { background: white; border: 1px solid var(--line); }
-#dim-ok { background: var(--navy); color: white; border: 0; }
+#dim-cancel, #form-cancel { background: white; border: 1px solid var(--line); }
+#dim-ok, #form-ok { background: var(--navy); color: white; border: 0; }
+
+#inspector, #palette {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 8px;
+  background: var(--bar);
+  border-top: 1px solid var(--line);
+  overflow-x: auto;
+  min-height: 58px;
+}
+#inspector button, #palette button, .chip {
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: white;
+  font-weight: 700;
+  color: var(--navy);
+  white-space: nowrap;
+}
+#palette button[aria-pressed="true"], .chip[aria-pressed="true"] { background: var(--navy); color: white; }
+.inspector-label { font-weight: 750; color: var(--navy); white-space: nowrap; padding-right: 4px; }
+#remove-toggle { color: var(--danger); border-color: #e3c4c0; }
+
+.room-label, .callout-label, .text-label, .opening-label, .manual-label {
+  position: absolute;
+  border: 0;
+  background: rgba(250, 249, 245, 0.92);
+  color: #1a1a1a;
+  font-weight: 750;
+  pointer-events: auto;
+  line-height: 1.2;
+}
+.room-label {
+  transform: translate(-50%, -50%);
+  text-align: center;
+  white-space: pre;
+  font-size: 14px;
+  min-width: 88px;
+  min-height: 48px;
+  pointer-events: none;
+}
+.callout-label, .text-label {
+  transform: translate(0, -50%);
+  text-align: left;
+  max-width: 240px;
+  font-size: 12px;
+  text-transform: uppercase;
+  padding: 6px 8px;
+  min-height: 44px;
+}
+.opening-label, .manual-label {
+  transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  min-width: 48px;
+  min-height: 40px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.label-selected { outline: 2px solid var(--green); }
+
+#form-layer { position: absolute; inset: 0; z-index: 21; }
+#form-backdrop { position: absolute; inset: 0; border: 0; background: rgba(28, 36, 48, 0.28); }
+#form-panel {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(520px, calc(100% - 24px));
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  background: #fffdf8;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+#form-title { margin: 0 0 12px; font-size: 20px; }
+.form-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.form-row span { font-size: 12px; font-weight: 750; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+.form-row input, .form-row textarea {
+  min-height: 48px;
+  font-size: 18px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--navy);
+  background: white;
+  width: 100%;
+}
+.form-row textarea { min-height: 96px; }
 
 @media (orientation: portrait) {
   #workspace { flex-direction: column-reverse; }
@@ -346,6 +457,8 @@ button:disabled { opacity: 0.35; }
   .grow { display: none; }
   .sep { width: 1px; height: 36px; margin: 0 4px; }
   .brand-product { font-size: 20px; }
+  .brand-compact { display: none; }
+  .phase-toggle button { min-width: 84px; }
   .list-header, .list-body { padding-left: 16px; padding-right: 16px; }
   .hint { display: none; }
 }
